@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+from pathlib import Path
 import ast
 import pprint
 import configparser
@@ -58,6 +59,7 @@ xplane_path =
 scenery_path =
 # Directory where satellite images are cached
 cache_dir = {os.path.join(os.path.expanduser("~"), ".autoortho-data", "cache")}
+log.info("ALLAN: cache_dir top: " + str(cache_dir))
 # Set directory for temporary downloading of scenery and other support files 
 download_dir = {os.path.join(os.path.expanduser("~"), ".autoortho-data", "downloads")}
 # Changing log_file dir is currently not supported
@@ -104,10 +106,26 @@ prefer_winfsp = False
 """
 
     def __init__(self, conf_file=None):
+        # Get AO_CONFIG environment variable
+        log.info("ALLAN Reading AO_CONFIG.")
+        env_config = os.environ.get("AO_CONFIG")
+        log.info("ALLAN: env_config: " + str(env_config))
         if not conf_file:
-            self.conf_file = os.path.join(os.path.expanduser("~"), ".autoortho")
+            # Check for AO_CONFIG environment variable
+            log.info("ALLAN: Reading AO_CONFIG.")
+            env_config = os.environ.get("AO_CONFIG")
+            log.info("ALLAN: env_config: " + str(env_config))
+
+            if env_config:
+                self.conf_file = Path(env_config).expanduser()
+                log.info("ALLAN: Setting from env: ")
+            else:
+                log.info("ALLAN: Not setting from env: ")
+                self.conf_file = os.path.join(os.path.expanduser("~"), ".autoortho")
         else:
+            log.info("ALLAN: Never hit the key part!")
             self.conf_file = conf_file
+        log.info("ALLAN: self.conf_file: " + str(self.conf_file))
 
         # Always load initially
         self.ready = self.load()
