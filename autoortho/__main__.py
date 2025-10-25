@@ -37,8 +37,26 @@ def setuplogs():
     log.info("ALLAN: env_data: " + str(env_data))
     log.info("ALLAN: log_dir: " + str(log_dir))
 
+def _quiet_external_loggers():
+    """Clamp noisy third-party loggers so the console stays readable."""
+    import logging
+    # Keep your own INFO/ERROR visible
+    logging.getLogger().setLevel(logging.INFO)
+
+    # Tame FUSE/refuse verbosity
+    for name, level in [
+        ("fuse", logging.WARNING),
+        ("refuse", logging.WARNING),
+        ("refuse.high", logging.ERROR),
+    ]:
+        lg = logging.getLogger(name)
+        lg.setLevel(level)
+        # prevent duplicate propagation up to root
+        lg.propagate = False
+
 import autoortho
 
 if __name__ == "__main__":
     setuplogs()
+    _quiet_external_loggers()
     autoortho.main()
