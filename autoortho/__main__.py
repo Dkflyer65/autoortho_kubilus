@@ -1,13 +1,20 @@
 #!/usr/bin/env python3
 
 import os
+from pathlib import Path
 import sys
 import logging
 import logging.handlers
 from aoconfig import CFG
 
 def setuplogs():
-    log_dir = os.path.join(os.path.expanduser("~"), ".autoortho-data", "logs")
+    # Get AO_DATA environment variable
+    env_data = os.environ.get("AO_DATA")  
+
+    if env_data:
+        log_dir = os.path.join(Path(env_data).expanduser(), "logs")
+    else:
+        log_dir = os.path.join(os.path.expanduser("~"), ".autoortho-data-11", "logs")
     if not os.path.isdir(log_dir):
         os.makedirs(log_dir)
 
@@ -27,6 +34,8 @@ def setuplogs():
     )
     log = logging.getLogger(__name__)
     log.info(f"Setup logs: {log_dir}, log level: {log_level}")
+    log.info("ALLAN: env_data: " + str(env_data))
+    log.info("ALLAN: log_dir: " + str(log_dir))
 
 import autoortho
 

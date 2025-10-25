@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+from pathlib import Path
 import re
 import sys
 import glob
@@ -613,12 +614,26 @@ class Region(object):
 
 class OrthoManager(object):
     url = "https://api.github.com/repos/kubilus1/autoortho-scenery/releases"
-    info_cache = os.path.join(os.path.expanduser("~"), ".autoortho-data", ".release_info")
+
+    # Get AO_DATA environment variable
+    log.info("ALLAN: Reading AO_DATA.")
+    env_data = os.environ.get("AO_DATA")  
+    log.info("ALLAN: env_data: " + str(env_data))
+
+    if env_data:
+        info_cache = os.path.join(Path(env_data).expanduser(), ".release_info")
+    else:
+        info_cache = os.path.join(os.path.expanduser("~"), ".autoortho-data-1", ".release_info")
+    log.info("ALLAN: info cache: " + str(info_cache))
 
     def __init__(self, extract_dir=None, download_dir=None, noclean=False):
         if not download_dir:
-            download_dir = CFG.paths.download_dir
-            #download_dir = os.path.join(os.path.expanduser("~"), ".autoortho-data", "downloads")
+            if env_data:
+                download_dir = os.path.join(Path(env_data).expanduser(), "downloads")
+            else:
+                download_dir = CFG.paths.download_dir
+            log.info("ALLAN: download_dir: " + str(download_dir))
+            #download_dir = os.path.join(os.path.expanduser("~"), ".autoortho-data-2", "downloads")
         if not extract_dir:
             extract_dir = CFG.paths.scenery_path
 
